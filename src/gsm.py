@@ -164,10 +164,12 @@ class GSM:
 
     def initCreg(self):
         at_timeout = int(self.config.get('TIMEOUT_AT'))
-        a, s = self.sendAT('AT+CREG?\r', '+CREG: 0,1', 10, at_timeout)
-        if (a < 0):
-            raise Exception, 'ERROR. initCreg() failed'
-        self.debug.send('initCreg() passed OK')
+        for i in range(10):
+            a, s = self.sendAT('AT+CREG?\r', 'OK', 1, at_timeout)
+            if((a == 0) and ((s.find('+CREG: 0,1') != -1) or (s.find('+CREG: 0,5') != -1))):
+                self.debug.send('initCreg() passed OK')
+                return
+        raise Exception, 'ERROR. initCreg() failed'
 
     def initCsq(self):
         at_timeout = int(self.config.get('TIMEOUT_AT'))
